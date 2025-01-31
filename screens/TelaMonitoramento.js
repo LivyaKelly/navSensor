@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert, Button } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, Image } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import styles from '../styles/styles';
 
@@ -9,28 +9,42 @@ const TelaMonitoramento = ({ navigation }) => {
   const [monitorando, setMonitorando] = useState(true);
 
   useEffect(() => {
-    const inscricao = Accelerometer.addListener((resultado) => {
-      setDados(resultado);
+    let inscricao;
 
-      if (
-        Math.abs(resultado.x) > 1.5 ||
-        Math.abs(resultado.y) > 1.5 ||
-        Math.abs(resultado.z) > 1.5
-      ) {
-        const movimento = {
-          x: resultado.x.toFixed(2),
-          y: resultado.y.toFixed(2),
-          z: resultado.z.toFixed(2),
-          timestamp: new Date().toLocaleTimeString(),
-        };
-        setHistorico((prev) => [...prev, movimento]);
-        Alert.alert('Movimento Detectado!', `X: ${movimento.x}, Y: ${movimento.y}, Z: ${movimento.z}`);
+    const iniciarMonitoramento = () => {
+      inscricao = Accelerometer.addListener((resultado) => {
+        setDados(resultado);
+
+        if (Math.abs(resultado.x) > 1.5 || Math.abs(resultado.y) > 1.5 || Math.abs(resultado.z) > 1.5) {
+          const movimento = {
+            x: resultado.x.toFixed(2),
+            y: resultado.y.toFixed(2),
+            z: resultado.z.toFixed(2),
+            timestamp: new Date().toLocaleTimeString(),
+          };
+
+          setHistorico((prev) => [...prev, movimento]);
+
+          Alert.alert(
+            '⚠️ Movimento Detectado! ⚠️',
+            `📊 Valores registrados:\n📌 X: ${movimento.x}\n📌 Y: ${movimento.y}\n📌 Z: ${movimento.z}`,
+            [{ text: 'OK', style: 'cancel' }]
+          );
+        }
+      });
+
+      Accelerometer.setUpdateInterval(500);
+    };
+
+    if (monitorando) {
+      iniciarMonitoramento();
+    }
+
+    return () => {
+      if (inscricao) {
+        inscricao.remove();
       }
-    });
-
-    Accelerometer.setUpdateInterval(500);
-
-    return () => inscricao && inscricao.remove();
+    };
   }, [monitorando]);
 
   const toggleMonitoramento = () => {
@@ -40,11 +54,34 @@ const TelaMonitoramento = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Acelerômetro:</Text>
-      <Text style={styles.value}>X: {dados.x.toFixed(2)}</Text>
-      <Text style={styles.value}>Y: {dados.y.toFixed(2)}</Text>
-      <Text style={styles.value}>Z: {dados.z.toFixed(2)}</Text>
-      <Button title={monitorando ? 'Pausar Monitoramento' : 'Retomar Monitoramento'} onPress={toggleMonitoramento} color="#007bff" />
-      <Button title="Ver Histórico" onPress={() => navigation.navigate('Historico', { historico })} color="#007bff" />
+
+      <View style={styles.sensorContainer}>
+        <Text style={styles.value}>X: {dados.x.toFixed(2)}</Text>
+        <Text style={styles.value}>Y: {dados.y.toFixed(2)}</Text>
+        <Text style={styles.value}>Z: {dados.z.toFixed(2)}</Text>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.button, monitorando ? styles.buttonSecondary : styles.buttonPrimary]}
+        onPress={toggleMonitoramento}
+      >
+        <View style={styles.buttonTextContainer}>
+          <Image
+            source={monitorando ? require('../assets/Paused_icon.png') : require('../assets/Play_icon.png')}
+            style={styles.buttonImage}
+          />
+          <Text style={styles.buttonText}>{monitorando ? 'Pausar Monitoramento' : 'Retomar Monitoramento'}</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.buttonPrimary]}
+        onPress={() => navigation.navigate('Historico', { historico })}
+      >
+        <View style={styles.buttonTextContainer}>
+          <Text style={styles.buttonText}>Ver Histórico</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

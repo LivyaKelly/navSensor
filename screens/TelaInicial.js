@@ -1,14 +1,22 @@
 import React from 'react';
-import { View, Text, Button, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import styles from '../styles/styles';
 
 const TelaInicial = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/menina-run.jpg')} style={styles.image} />
-      <Text style={styles.title}>Bem-vindo ao Sensor de Acelerômetro</Text>
-      <Button title="Iniciar Monitoramento" onPress={() => navigation.navigate('Monitoramento')} color="#007bff" />
-      <Button title="Ver Histórico" onPress={() => navigation.navigate('Historico')} color="#007bff" />
+      <Image source={require('../assets/MulherCorrendo.png')} style={styles.imageInicial} />
+      <Text style={styles.title}>Bem-vindo ao Sensor Acelerômetro</Text>
+
+      <TouchableOpacity
+        style={[styles.button, styles.buttonPrimary]}
+        onPress={() => navigation.navigate('Monitoramento')}
+      >
+        <View style={styles.buttonTextContainer}>
+          <Image source={require('../assets/Foguete_icon.png')} style={styles.buttonImage} />
+          <Text style={styles.buttonText}>Iniciar Monitoramento</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };

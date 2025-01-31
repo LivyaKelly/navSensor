@@ -12,9 +12,14 @@ const TelaHistorico = ({ route }) => {
         data={historico}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <Text style={styles.value}>
-            {item.timestamp} - X: {item.x}, Y: {item.y}, Z: {item.z}
-          </Text>
+          <View style={styles.historyCard}>
+            <Text style={styles.historyTime}>⏰ {item.timestamp}</Text>
+            <View style={styles.historyValuesContainer}>
+              <Text style={styles.historyValues}>📍 X: {item.x}</Text>
+              <Text style={styles.historyValues}>📍 Y: {item.y}</Text>
+              <Text style={styles.historyValues}>📍 Z: {item.z}</Text>
+            </View>
+          </View>
         )}
       />
     </View>
